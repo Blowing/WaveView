@@ -15,6 +15,17 @@ class Solid extends View {
     private Paint aboveWavePaint;
     private Paint blowWavePaint;
 
+    public void setMiddleWavePaint(Paint middleWavePaint) {
+        this.middleWavePaint = middleWavePaint;
+    }
+
+    public void setBottomWavePaint(Paint bottomWavePaint) {
+        this.bottomWavePaint = bottomWavePaint;
+    }
+
+    private Paint middleWavePaint;
+    private Paint bottomWavePaint;
+
     public Solid(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
@@ -39,5 +50,7 @@ class Solid extends View {
         super.onDraw(canvas);
         canvas.drawRect(getLeft(), 0, getRight(), getBottom(), blowWavePaint);
         canvas.drawRect(getLeft(), 0, getRight(), getBottom(), aboveWavePaint);
+        canvas.drawRect(getLeft(), 0, getRight(), getBottom(), middleWavePaint);
+        canvas.drawRect(getLeft(), 0, getRight(), getBottom(), bottomWavePaint);
     }
 }

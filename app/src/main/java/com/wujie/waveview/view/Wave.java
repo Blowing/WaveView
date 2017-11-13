@@ -12,8 +12,8 @@ import com.wujie.waveview.R;
 
 // y=Asin(ωx+φ)+k
 class Wave extends View {
-    private final int WAVE_HEIGHT_LARGE = 16;
-    private final int WAVE_HEIGHT_MIDDLE = 8;
+    private final int WAVE_HEIGHT_LARGE = 36;
+    private final int WAVE_HEIGHT_MIDDLE = 15;
     private final int WAVE_HEIGHT_LITTLE = 5;
 
     private final float WAVE_LENGTH_MULTIPLE_LARGE = 1.5f;
@@ -25,19 +25,43 @@ class Wave extends View {
     private final float WAVE_HZ_SLOW = 0.05f;
 
     public final int DEFAULT_ABOVE_WAVE_ALPHA = 50;
-    public final int DEFAULT_BLOW_WAVE_ALPHA = 30;
+    public final int DEFAULT_BLOW_WAVE_ALPHA = 50;
 
     private final float X_SPACE = 20;
     private final double PI2 = 2 * Math.PI;
 
     private Path mAboveWavePath = new Path();
     private Path mBlowWavePath = new Path();
+    private Path mMiddelWavePath = new Path();
+    private Path mBottomWavePath = new Path();
 
     private Paint mAboveWavePaint = new Paint();
     private Paint mBlowWavePaint = new Paint();
+    private Paint mMiddleWavePaint = new Paint();
+
+    public Paint getmMiddleWavePaint() {
+        return mMiddleWavePaint;
+    }
+
+    public Paint getmBottomWavePaint() {
+        return mBottomWavePaint;
+    }
+
+    private Paint mBottomWavePaint = new Paint();
 
     private int mAboveWaveColor;
     private int mBlowWaveColor;
+
+    public void setmMiddleWaveColor(int mMiddleWaveColor) {
+        this.mMiddleWaveColor = mMiddleWaveColor;
+    }
+
+    public void setmBottomWaveColor(int mBottomWaveColor) {
+        this.mBottomWaveColor = mBottomWaveColor;
+    }
+
+    private int mMiddleWaveColor;
+    private int mBottomWaveColor;
 
     private float mWaveMultiple;
     private float mWaveLength;
@@ -47,7 +71,10 @@ class Wave extends View {
 
     // wave animation
     private float mAboveOffset = 0.0f;
+    private float mMiddleOffset ;
     private float mBlowOffset;
+    private float mBottomOffset;
+
 
     private RefreshProgressRunnable mRefreshProgressRunnable;
 
@@ -69,6 +96,8 @@ class Wave extends View {
 
         canvas.drawPath(mBlowWavePath, mBlowWavePaint);
         canvas.drawPath(mAboveWavePath, mAboveWavePaint);
+        canvas.drawPath(mMiddelWavePath, mMiddleWavePaint);
+        canvas.drawPath(mBottomWavePath, mBottomWavePaint);
     }
 
     public void setAboveWaveColor(int aboveWaveColor) {
@@ -92,6 +121,8 @@ class Wave extends View {
         mWaveHeight = getWaveHeight(waveHeight);
         mWaveHz = getWaveHz(waveHz);
         mBlowOffset = mWaveHeight * 0.4f;
+        mMiddleOffset = mWaveHeight * 0.8f;
+        mBottomOffset = mWaveHeight * 0.6f;
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 mWaveHeight * 2);
         setLayoutParams(params);
@@ -99,14 +130,26 @@ class Wave extends View {
 
     public void initializePainters() {
         mAboveWavePaint.setColor(mAboveWaveColor);
-        mAboveWavePaint.setAlpha(DEFAULT_ABOVE_WAVE_ALPHA);
+       // mAboveWavePaint.setAlpha(DEFAULT_ABOVE_WAVE_ALPHA);
         mAboveWavePaint.setStyle(Paint.Style.FILL);
         mAboveWavePaint.setAntiAlias(true);
 
         mBlowWavePaint.setColor(mBlowWaveColor);
-        mBlowWavePaint.setAlpha(DEFAULT_BLOW_WAVE_ALPHA);
+        //mBlowWavePaint.setAlpha(DEFAULT_BLOW_WAVE_ALPHA);
         mBlowWavePaint.setStyle(Paint.Style.FILL);
         mBlowWavePaint.setAntiAlias(true);
+
+        mMiddleWavePaint.setColor(mMiddleWaveColor);
+        //mMiddleWavePaint.setAlpha(DEFAULT_ABOVE_WAVE_ALPHA);
+        mMiddleWavePaint.setStyle(Paint.Style.FILL);
+        mMiddleWavePaint.setAntiAlias(true);
+
+        mBottomWavePaint.setColor(mMiddleWaveColor);
+        //mBottomWavePaint.setAlpha(DEFAULT_ABOVE_WAVE_ALPHA);
+        mBottomWavePaint.setStyle(Paint.Style.FILL);
+        mBottomWavePaint.setAntiAlias(true);
+
+
     }
 
     private float getWaveMultiple(int size) {
@@ -151,7 +194,8 @@ class Wave extends View {
     private void calculatePath() {
         mAboveWavePath.reset();
         mBlowWavePath.reset();
-
+        mMiddelWavePath.reset();
+        mBottomWavePath.reset();
         getWaveOffset();
 
         float y;
@@ -162,12 +206,26 @@ class Wave extends View {
         }
         mAboveWavePath.lineTo(right, bottom);
 
+        mMiddelWavePath.moveTo(left, bottom);
+        for (float x = 0; x <= mMaxRight; x += X_SPACE) {
+            y = (float) (mWaveHeight * Math.sin(omega * x + mMiddleOffset) + mWaveHeight);
+            mMiddelWavePath.lineTo(x, y);
+        }
+        mMiddelWavePath.lineTo(right, bottom);
+
         mBlowWavePath.moveTo(left, bottom);
         for (float x = 0; x <= mMaxRight; x += X_SPACE) {
             y = (float) (mWaveHeight * Math.sin(omega * x + mBlowOffset) + mWaveHeight);
             mBlowWavePath.lineTo(x, y);
         }
         mBlowWavePath.lineTo(right, bottom);
+
+        mBottomWavePath.moveTo(left, bottom);
+        for (float x = 0; x <= mMaxRight; x += X_SPACE) {
+            y = (float) (mWaveHeight * Math.sin(omega * x + mBottomOffset) + mWaveHeight);
+            mBottomWavePath.lineTo(x, y);
+        }
+        mBottomWavePath.lineTo(right, bottom);
     }
 
     @Override
@@ -213,13 +271,25 @@ class Wave extends View {
         if (mBlowOffset > Float.MAX_VALUE - 100) {
             mBlowOffset = 0;
         } else {
-            mBlowOffset += mWaveHz;
+            mBlowOffset += (mWaveHz +0.01);
         }
 
         if (mAboveOffset > Float.MAX_VALUE - 100) {
             mAboveOffset = 0;
         } else {
             mAboveOffset += mWaveHz;
+        }
+
+        if (mMiddleOffset > Float.MAX_VALUE - 100) {
+            mMiddleOffset = 0;
+        } else {
+            mMiddleOffset += (mWaveHz + 0.02);
+        }
+
+        if (mBottomOffset > Float.MAX_VALUE - 100) {
+            mBottomOffset = 0;
+        } else {
+            mBottomOffset += (mWaveHz + 0.03);
         }
     }
 

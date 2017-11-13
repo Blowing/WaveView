@@ -46,17 +46,24 @@ public class WaveView extends LinearLayout {
         mWaveHeight = attributes.getInt(R.styleable.WaveView_wave_height, MIDDLE);
         mWaveMultiple = attributes.getInt(R.styleable.WaveView_wave_length, LARGE);
         mWaveHz = attributes.getInt(R.styleable.WaveView_wave_hz, MIDDLE);
-        attributes.recycle();
+
 
         mWave = new Wave(context, null);
         mWave.initializeWaveSize(mWaveMultiple, mWaveHeight, mWaveHz);
         mWave.setAboveWaveColor(mAboveWaveColor);
         mWave.setBlowWaveColor(mBlowWaveColor);
+        mWave.setmMiddleWaveColor(attributes.getColor(R.styleable.WaveView_middle_wave_color,DEFAULT_ABOVE_WAVE_COLOR));
+        mWave.setmBottomWaveColor(attributes.getColor(R.styleable.WaveView_bottom_wave_color, DEFAULT_ABOVE_WAVE_COLOR));
+        attributes.recycle();
         mWave.initializePainters();
 
         mSolid = new Solid(context, null);
+
+
         mSolid.setAboveWavePaint(mWave.getAboveWavePaint());
         mSolid.setBlowWavePaint(mWave.getBlowWavePaint());
+        mSolid.setMiddleWavePaint(mWave.getmMiddleWavePaint());
+        mSolid.setBottomWavePaint(mWave.getmBottomWavePaint());
 
         addView(mWave);
         addView(mSolid);
