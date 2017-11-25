@@ -76,13 +76,17 @@ public class WaveView extends LinearLayout {
         computeWaveToTop();
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasWindowFocus) {
-        super.onWindowFocusChanged(hasWindowFocus);
-        if (hasWindowFocus) {
-            computeWaveToTop();
-        }
+    public void startAnimation() {
+        computeWaveToTop();
+        mWave.startAnimation();
     }
+//    @Override
+//    public void onWindowFocusChanged(boolean hasWindowFocus) {
+//        super.onWindowFocusChanged(hasWindowFocus);
+//        if (hasWindowFocus) {
+//            computeWaveToTop();
+//        }
+//    }
 
     private void computeWaveToTop() {
         mWaveToTop = (int) (getHeight() * (1f - mProgress / 100f));

@@ -8,6 +8,7 @@
     tools:context="com.wujie.waveview.MainActivity">
 
     <com.wujie.waveview.view.WaveView
+        android:visibility="gone"
         android:id="@+id/wave_view"
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -28,4 +29,42 @@
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="20dp"
         android:progress="80" />
+
+    <com.wujie.waveview.view.WhewView
+        android:id="@+id/whewView"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_below="@+id/seek_bar"
+        android:layout_marginTop="65dp"
+        android:layout_toEndOf="@+id/wave_view"
+        android:layout_toRightOf="@+id/wave_view" />
+
+    <RelativeLayout
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_below="@+id/seek_bar"
+        android:layout_marginTop="65dp"
+        android:layout_toEndOf="@+id/wave_view"
+        android:layout_toRightOf="@+id/wave_view">
+
+
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/speech_annimal"
+            android:visibility="visible" />
+    </RelativeLayout>
+
+
+    <com.wujie.waveview.Wave
+        android:id="@+id/wave"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/whewView"
+        android:layout_marginTop="64dp" />
 </RelativeLayout>

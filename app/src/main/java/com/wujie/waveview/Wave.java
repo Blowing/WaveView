@@ -1,16 +1,17 @@
-package com.wujie.waveview.view;
+package com.wujie.waveview;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 
-import com.wujie.waveview.R;
+/**
+ * Created by wujie on 2017/11/16/016.
+ */
 
-// y=Asin(ωx+φ)+k
 class Wave extends View {
     private final int WAVE_HEIGHT_LARGE = 36;
     private final int WAVE_HEIGHT_MIDDLE = 15;
@@ -49,8 +50,8 @@ class Wave extends View {
 
     private Paint mBottomWavePaint = new Paint();
 
-    private int mAboveWaveColor;
-    private int mBlowWaveColor;
+    private int mAboveWaveColor = Color.GREEN;
+    private int mBlowWaveColor = Color.RED;
 
     public void setmMiddleWaveColor(int mMiddleWaveColor) {
         this.mMiddleWaveColor = mMiddleWaveColor;
@@ -60,8 +61,8 @@ class Wave extends View {
         this.mBottomWaveColor = mBottomWaveColor;
     }
 
-    private int mMiddleWaveColor;
-    private int mBottomWaveColor;
+    private int mMiddleWaveColor = Color.BLUE;
+    private int mBottomWaveColor = Color.YELLOW;
 
     private float mWaveMultiple;
     private float mWaveLength;
@@ -71,28 +72,31 @@ class Wave extends View {
 
     // wave animation
     private float mAboveOffset = 0.0f;
-    private float mMiddleOffset ;
+    private float mMiddleOffset;
     private float mBlowOffset;
     private float mBottomOffset;
 
 
-    private RefreshProgressRunnable mRefreshProgressRunnable;
+    private Wave.RefreshProgressRunnable mRefreshProgressRunnable;
 
     private int left, right, bottom;
     // ω
     private double omega;
 
     public Wave(Context context, AttributeSet attrs) {
-        this(context, attrs, R.attr.waveViewStyle);
+        this(context, attrs, 0);
+        initializeWaveSize();
     }
 
     public Wave(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        initializeWaveSize();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        calculatePath();
 
         canvas.drawPath(mBlowWavePath, mBlowWavePaint);
         canvas.drawPath(mAboveWavePath, mAboveWavePaint);
@@ -116,21 +120,24 @@ class Wave extends View {
         return mBlowWavePaint;
     }
 
-    public void initializeWaveSize(int waveMultiple, int waveHeight, int waveHz) {
-        mWaveMultiple = getWaveMultiple(waveMultiple);
-        mWaveHeight = getWaveHeight(waveHeight);
-        mWaveHz = getWaveHz(waveHz);
+    public void initializeWaveSize() {
+        mWaveMultiple = 1.5f;
+        mWaveHeight = 26;
+        mWaveHz = 0.13f;
         mBlowOffset = mWaveHeight * 0.4f;
         mMiddleOffset = mWaveHeight * 0.8f;
         mBottomOffset = mWaveHeight * 0.6f;
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                mWaveHeight * 2);
-        setLayoutParams(params);
+//        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+//                mWaveHeight * 2);
+//        setLayoutParams(params);
+        startWave();
+        initializePainters();
+
     }
 
     public void initializePainters() {
         mAboveWavePaint.setColor(mAboveWaveColor);
-       // mAboveWavePaint.setAlpha(DEFAULT_ABOVE_WAVE_ALPHA);
+        // mAboveWavePaint.setAlpha(DEFAULT_ABOVE_WAVE_ALPHA);
         mAboveWavePaint.setStyle(Paint.Style.FILL);
         mAboveWavePaint.setAntiAlias(true);
 
@@ -152,41 +159,41 @@ class Wave extends View {
 
     }
 
-    private float getWaveMultiple(int size) {
-        switch (size) {
-            case WaveView.LARGE:
-                return WAVE_LENGTH_MULTIPLE_LARGE;
-            case WaveView.MIDDLE:
-                return WAVE_LENGTH_MULTIPLE_MIDDLE;
-            case WaveView.LITTLE:
-                return WAVE_LENGTH_MULTIPLE_LITTLE;
-        }
-        return 0;
-    }
+//    private float getWaveMultiple(int size) {
+//        switch (size) {
+//            case WaveView.LARGE:
+//                return WAVE_LENGTH_MULTIPLE_LARGE;
+//            case WaveView.MIDDLE:
+//                return WAVE_LENGTH_MULTIPLE_MIDDLE;
+//            case WaveView.LITTLE:
+//                return WAVE_LENGTH_MULTIPLE_LITTLE;
+//        }
+//        return 0;
+//    }
 
-    private int getWaveHeight(int size) {
-        switch (size) {
-            case WaveView.LARGE:
-                return WAVE_HEIGHT_LARGE;
-            case WaveView.MIDDLE:
-                return WAVE_HEIGHT_MIDDLE;
-            case WaveView.LITTLE:
-                return WAVE_HEIGHT_LITTLE;
-        }
-        return 0;
-    }
+//    private int getWaveHeight(int size) {
+//        switch (size) {
+//            case WaveView.LARGE:
+//                return WAVE_HEIGHT_LARGE;
+//            case WaveView.MIDDLE:
+//                return WAVE_HEIGHT_MIDDLE;
+//            case WaveView.LITTLE:
+//                return WAVE_HEIGHT_LITTLE;
+//        }
+//        return 0;
+//    }
 
-    private float getWaveHz(int size) {
-        switch (size) {
-            case WaveView.LARGE:
-                return WAVE_HZ_FAST;
-            case WaveView.MIDDLE:
-                return WAVE_HZ_NORMAL;
-            case WaveView.LITTLE:
-                return WAVE_HZ_SLOW;
-        }
-        return 0;
-    }
+//    private float getWaveHz(int size) {
+//        switch (size) {
+//            case WaveView.LARGE:
+//                return WAVE_HZ_FAST;
+//            case WaveView.MIDDLE:
+//                return WAVE_HZ_NORMAL;
+//            case WaveView.LITTLE:
+//                return WAVE_HZ_SLOW;
+//        }
+//        return 0;
+//    }
 
     /**
      * calculate wave track
@@ -228,43 +235,13 @@ class Wave extends View {
         mBottomWavePath.lineTo(right, bottom);
     }
 
-    public void startAnimation() {
-        removeCallbacks(mRefreshProgressRunnable);
-        mRefreshProgressRunnable = new RefreshProgressRunnable();
-        post(mRefreshProgressRunnable);
-    }
-
-    @Override
-    protected void onWindowVisibilityChanged(int visibility) {
-        super.onWindowVisibilityChanged(visibility);
-        if (View.GONE == visibility) {
-            removeCallbacks(mRefreshProgressRunnable);
-        } else {
-            removeCallbacks(mRefreshProgressRunnable);
-            mRefreshProgressRunnable = new RefreshProgressRunnable();
-            post(mRefreshProgressRunnable);
-        }
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-    }
 
 
 
-    @Override
-    public void onWindowFocusChanged(boolean hasWindowFocus) {
-        super.onWindowFocusChanged(hasWindowFocus);
-        if (hasWindowFocus) {
-            if (mWaveLength == 0) {
-                startWave();
-            }
-        }
-    }
+
 
     private void startWave() {
-        if (getWidth() != 0) {
+//        if (getWidth() != 0) {
             int width = getWidth();
             mWaveLength = width * mWaveMultiple;
             left = getLeft();
@@ -272,14 +249,14 @@ class Wave extends View {
             bottom = getBottom() + 2;
             mMaxRight = right + X_SPACE;
             omega = PI2 / mWaveLength;
-        }
+//        }
     }
 
     private void getWaveOffset() {
         if (mBlowOffset > Float.MAX_VALUE - 100) {
             mBlowOffset = 0;
         } else {
-            mBlowOffset += (mWaveHz +0.01);
+            mBlowOffset += (mWaveHz + 0.01);
         }
 
         if (mAboveOffset > Float.MAX_VALUE - 100) {
@@ -315,5 +292,6 @@ class Wave extends View {
             }
         }
     }
-
 }
+
+
