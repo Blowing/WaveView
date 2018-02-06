@@ -59,7 +59,7 @@ public class WhewView extends View {
         // 设置博文的颜色
         paint.setColor(0x006FF1);
         maxWidth = Dp2Px(context, 80);
-        alphaList.add("100");// 圆心的不透明度
+        alphaList.add("160");// 圆心的不透明度
         startWidthList.add("0");
     }
 
@@ -84,16 +84,16 @@ public class WhewView extends View {
                         paint);
                 // 同心圆扩散
                 if (isStarting && alpha > 0 && startWidth < maxWidth) {
-                    alphaList.set(i, (alpha - 1) + "");
-                    startWidthList.set(i, startWidth + "");
+                    alphaList.set(i, (alpha - 2) + "");
+                    startWidthList.set(i, (startWidth + 1) + "");
                 }
             //}
 
         }
         if (isStarting
                 && Integer
-                .parseInt(startWidthList.get(startWidthList.size() - 1)) == Dp2Px(context,6)) {
-            alphaList.add("100");
+                .parseInt(startWidthList.get(startWidthList.size() - 1)) == Dp2Px(context,15)) {
+            alphaList.add("160");
             startWidthList.add("0");
         }
         // 同心圆数量达到10个，删除最外层圆
@@ -106,21 +106,7 @@ public class WhewView extends View {
             public void run() {
                 invalidate();
             }
-        }, 50);
-        //invalidate();
-        // 刷新界面
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                try {
-//                    Thread.sleep(500);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
-
+        }, 10);
 
     }
 
